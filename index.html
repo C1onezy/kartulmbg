@@ -1,3 +1,4 @@
+cat > /mnt/user-data/outputs/kartulmbg.html << 'HTMLEOF'
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -184,6 +185,106 @@
         .doc-chapter ul, .doc-chapter ol { margin-left: 25px; margin-bottom: 15px; } .doc-chapter li { margin-bottom: 8px; line-height: 1.6; color: var(--text); }
         .ref-list { list-style: none; margin-left: 0; } .ref-list li { margin-bottom: 15px; padding-left: 20px; position: relative; } .ref-list li::before { content: '•'; position: absolute; left: 0; color: var(--accent); font-weight: bold; }
 
+        /* ===== PASSWORD GATE ===== */
+        .password-gate {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 80vh;
+            padding: 40px 20px;
+        }
+        .password-box {
+            background: white;
+            border-radius: 16px;
+            padding: 50px 40px;
+            max-width: 420px;
+            width: 100%;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+            text-align: center;
+            border-top: 5px solid var(--accent);
+        }
+        .password-icon {
+            font-size: 3rem;
+            color: var(--accent);
+            margin-bottom: 20px;
+        }
+        .password-box h2 {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+        .password-box p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 28px;
+        }
+        .password-input-wrap {
+            position: relative;
+            margin-bottom: 16px;
+        }
+        .password-input-wrap input {
+            width: 100%;
+            padding: 14px 48px 14px 18px;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            font-size: 1rem;
+            font-family: inherit;
+            font-weight: 600;
+            color: var(--primary);
+            background: var(--bg);
+            transition: border-color 0.3s;
+            outline: none;
+        }
+        .password-input-wrap input:focus {
+            border-color: var(--accent);
+        }
+        .password-input-wrap input.error {
+            border-color: #e17055;
+            background: #fff5f5;
+        }
+        .toggle-pw-btn {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-muted);
+            font-size: 1.2rem;
+            padding: 0;
+            display: flex;
+            align-items: center;
+        }
+        .pw-error-msg {
+            color: #e17055;
+            font-size: 0.82rem;
+            font-weight: 700;
+            margin-bottom: 14px;
+            display: none;
+        }
+        .pw-error-msg.show { display: block; }
+        .btn-pw-submit {
+            width: 100%;
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: inherit;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .btn-pw-submit:hover { background: #0652DD; }
+
         footer { background: var(--primary); color: white; padding: 40px 5% 20px; margin-top: 50px; }
         .footer-content { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; }
         .footer-text p { opacity: 0.8; font-size: 0.9rem; }
@@ -203,6 +304,7 @@
             .bar-label { width: 120px; font-size: 0.75rem; }
             .kp-grid { grid-template-columns: 1fr; }
             .btn-back-home { bottom: 20px; left: 20px; padding: 12px 18px; font-size: 0.82rem; }
+            .password-box { padding: 35px 25px; }
         }
         @media (min-width: 901px) and (max-width: 1100px) {
             .kp-grid { grid-template-columns: repeat(2, 1fr); }
@@ -413,7 +515,27 @@
 
     <!-- HALAMAN DOKUMEN LENGKAP -->
     <div class="page" id="page-dokumen">
-        <section class="section" style="padding-top: 120px;">
+        <!-- PASSWORD GATE -->
+        <div class="password-gate" id="passwordGate">
+            <div class="password-box">
+                <div class="password-icon"><i class='bx bx-lock-alt'></i></div>
+                <h2>Dokumen di Kunci</h2>
+                <p>Membutuhkan kode akses</p>
+                <div class="password-input-wrap">
+                    <input type="password" id="pwInput" placeholder="Masukkan password..." onkeydown="if(event.key==='Enter') checkPassword()" />
+                    <button class="toggle-pw-btn" onclick="togglePwVisibility()" type="button">
+                        <i class='bx bx-hide' id="togglePwIcon"></i>
+                    </button>
+                </div>
+                <div class="pw-error-msg" id="pwErrorMsg">Password salah. Coba lagi.</div>
+                <button class="btn-pw-submit" onclick="checkPassword()">
+                    <i class='bx bx-unlock-alt'></i> Buka Dokumen
+                </button>
+            </div>
+        </div>
+
+        <!-- DOCUMENT CONTENT (hidden until unlocked) -->
+        <section class="section" style="padding-top: 120px; display:none;" id="docContent">
             <div class="document-viewer">
                 <div class="doc-cover"><h1>POTENSI DAN TANTANGAN DIRI UNTUK MENJADI SEORANG SOFTWARE DEVELOPER</h1><p><strong>Muhammad Bagir</strong></p><p>032025009</p><p style="margin-top:15px;">SMA Embun Pagi Islamic School</p><p>2026</p></div>
                 <div class="doc-chapter"><h2>BAB I PENDAHULUAN</h2><h3>1.1. Latar Belakang</h3><p>Dunia teknologi, khususnya teknologi informasi, telah mengalami perkembangan yang pesat. Teknologi informasi ini dapat disebut sebagai dunia maya atau internet. Perkembangannya telah mengubah cara manusia berkomunikasi, memungkinkan seseorang untuk berinteraksi dengan banyak orang tanpa harus bertemu secara langsung. Kemajuan ini juga melahirkan berbagai situs, aplikasi, dan platform digital (Yuniar & Nurwidawati, 2013).</p><p>Software developer adalah seorang profesional yang bertugas merancang, mengembangkan, menguji, dan memelihara perangkat lunak. Mereka bekerja pada berbagai jenis aplikasi, mulai dari sistem operasi, aplikasi mobile dan desktop, hingga perangkat lunak berbasis web. Seorang software developer harus mampu menerjemahkan kebutuhan pengguna atau klien menjadi solusi digital yang fungsional, efisien, dan mudah digunakan.</p><p>Profesi software developer tidak hanya terbatas pada industri teknologi informasi, tetapi juga tersebar di berbagai sektor seperti pendidikan, kesehatan, keuangan, pemerintahan, transportasi, hiburan, dan manufaktur. Mereka memiliki peran penting dalam menciptakan sistem atau aplikasi yang dapat menyelesaikan berbagai masalah, seperti platform e-commerce, layanan kesehatan digital, sistem administrasi pendidikan, hingga aplikasi layanan publik berbasis mobile maupun web. Di era digital, software developer menjadi salah satu elemen utama dalam pengembangan teknologi berbasis cloud, artificial intelligence (AI), internet of things (IoT), dan cybersecurity.</p><p>Untuk menjadi seorang software developer, seseorang harus memiliki keahlian dalam pemrograman (seperti Python, Java, C++, atau JavaScript), pengelolaan basis data (SQL atau NoSQL), debugging, pengujian perangkat lunak, serta pemahaman logika dan struktur data. Selain itu, penguasaan tools seperti Git, Docker, dan platform pengembangan modern menjadi nilai tambah. Kemampuan berpikir kritis, problem-solving, dan adaptasi terhadap teknologi baru juga sangat dibutuhkan untuk menghadapi perkembangan teknologi yang cepat.</p><p>Jurusan yang mendukung karir ini umumnya berasal dari Fakultas Ilmu Komputer. Di Indonesia, salah satu program studi tingkat sarjana terbaik di bidang ilmu komputer terdapat di Universitas Indonesia. Fakultas Ilmu Komputer Universitas Indonesia menawarkan kurikulum berbasis landasan ilmiah dan praktik, seperti matematika diskret, algoritma, basis data, jaringan komputer, keamanan siber, dan pengembangan perangkat lunak.</p><p>Namun, masuk ke jurusan ilmu komputer sering kali menjadi tantangan tersendiri. Persaingan yang ketat dan persyaratan akademik yang tinggi, terutama pada mata pelajaran seperti matematika, fisika, dan logika, membuat banyak calon mahasiswa kesulitan memenuhi standar penerimaan. Saya sebagai penulis pun pernah mengalami hambatan serupa. Salah satu kekurangan saya adalah kemampuan matematika yang tidak selalu berada pada tingkat terbaik, sehingga membutuhkan usaha lebih untuk memahami konsep-konsep teknis. Meski demikian, saya memiliki kelebihan dalam hal ketekunan dan minat yang kuat terhadap dunia teknologi, khususnya pemrograman. Ketertarikan tersebut mendorong saya untuk terus belajar secara mandiri melalui berbagai sumber, sehingga dapat perlahan mengatasi keterbatasan yang ada. Oleh karena itu, pengalaman pribadi ini menjadi motivasi bagi saya untuk meneliti lebih dalam mengenai tantangan dan peluang yang dihadapi calon software developer dalam memulai perjalanan mereka.</p><p>Keahlian utama yang dibutuhkan untuk menjadi seorang software developer meliputi kreativitas dalam memecahkan masalah, kemampuan teknis yang kuat, dan kesiapan untuk terus belajar mengikuti perkembangan teknologi. Hambatan seperti kurangnya pengalaman praktis, minimnya akses pelatihan, atau kesulitan memahami konsep tertentu sering kali menjadi tantangan yang harus dihadapi. Oleh karena itu, penting untuk melakukan persiapan sejak dini agar dapat bersaing di industri teknologi modern.</p><h3>1.2. Rumusan Masalah</h3><p>Berdasarkan latar belakang masalah yang telah dijelaskan di atas, lalu perumusan masalah dalam penelitian adalah "Bagaimana potensi dan tantangan saya untuk menjadi seorang software developer?"</p><h3>1.3. Tujuan</h3><ul><li>Menumbuhkan motivasi dan cita-cita untuk mengenal potensi dan tantangan diri untuk menjadi seorang software developer</li><li>Menambah dan mengenal wawasan tentang profesi pada bidang IT</li><li>Membantu dan mengarahkan minat diri terhadap profesi yang akan dituju di masa depan</li></ul><h3>1.4. Manfaat</h3><ul><li>Memberikan pemahaman bagi penulis mengenai potensi, tantangan, dan langkah yang diperlukan untuk menjadi seorang Software Developer.</li><li>Menjadi sumber informasi dan wawasan bagi siswa atau pembaca lain yang tertarik pada profesi di bidang teknologi informasi.</li><li>Memberikan kontribusi bagi lingkungan pendidikan dalam mendukung minat dan pengembangan karier siswa di bidang IT.</li></ul></div>
@@ -457,7 +579,64 @@
             } else {
                 btnBack.classList.add('show');
             }
+
+            // Reset password gate when navigating away from dokumen
+            if (pageId !== 'dokumen') {
+                resetPasswordGate();
+            }
         }
+
+        // PASSWORD GATE
+        var docUnlocked = false;
+
+        function checkPassword() {
+            var input = document.getElementById('pwInput').value;
+            if (input === 'kartul13') {
+                docUnlocked = true;
+                document.getElementById('passwordGate').style.display = 'none';
+                document.getElementById('docContent').style.display = 'block';
+            } else {
+                document.getElementById('pwInput').classList.add('error');
+                document.getElementById('pwErrorMsg').classList.add('show');
+                document.getElementById('pwInput').value = '';
+                setTimeout(function() {
+                    document.getElementById('pwInput').classList.remove('error');
+                    document.getElementById('pwErrorMsg').classList.remove('show');
+                }, 2500);
+            }
+        }
+
+        function resetPasswordGate() {
+            if (!docUnlocked) return;
+            // Keep unlocked state across navigation — only reset if explicitly needed
+        }
+
+        function togglePwVisibility() {
+            var input = document.getElementById('pwInput');
+            var icon = document.getElementById('togglePwIcon');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.className = 'bx bx-show';
+            } else {
+                input.type = 'password';
+                icon.className = 'bx bx-hide';
+            }
+        }
+
+        // Override showPage for dokumen to check unlock state
+        var _originalShowPage = showPage;
+        showPage = function(pageId) {
+            _originalShowPage(pageId);
+            if (pageId === 'dokumen') {
+                if (docUnlocked) {
+                    document.getElementById('passwordGate').style.display = 'none';
+                    document.getElementById('docContent').style.display = 'block';
+                } else {
+                    document.getElementById('passwordGate').style.display = 'flex';
+                    document.getElementById('docContent').style.display = 'none';
+                }
+            }
+        };
 
         // MODAL RINGKASAN
         function openSummary(id) {
